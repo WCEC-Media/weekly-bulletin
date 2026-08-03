@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>週報 - 手機版</title>
+<style>
+  :root {
+    --bg: #faf9f7;
+    --card-bg: #ffffff;
+    --text: #2b2926;
+    --text-light: #6b6862;
+    --accent: #c96442;
+    --border: #e8e4de;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Noto Sans TC", sans-serif;
+    line-height: 1.7;
+  }
+  .header {
+    background: var(--card-bg);
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+  }
+  .header h1 { font-size: 20px; margin: 0 0 4px; }
+  .header .updated { font-size: 13px; color: var(--text-light); }
+  .container { max-width: 640px; margin: 0 auto; padding: 20px 20px 60px; }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .content h2 { font-size: 17px; color: var(--accent); margin: 24px 0 10px; }
+  .content h2:first-child { margin-top: 0; }
+  .content p { font-size: 15px; margin: 8px 0; }
+  .content ul { padding-left: 20px; font-size: 15px; }
+  .content li { margin: 6px 0; }
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--text-light); }
+  .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+  .refresh-btn {
+    display: block; width: 100%; padding: 12px; margin-top: 16px;
+    background: var(--accent); color: white; border: none; border-radius: 8px;
+    font-size: 15px; text-align: center; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <div class="header">
+    <h1>📋 週報</h1>
+    <div class="updated" id="updatedTime">載入中...</div>
+  </div>
+  <div class="container">
+    <div class="card">
+      <div class="content" id="reportContent">
+        <div class="empty-state"><div class="icon">⏳</div><div>正在讀取最新週報...</div></div>
+      </div>
+    </div>
+    <button class="refresh-btn" onclick="loadReport()">🔄 重新整理</button>
+  </div>
+
+  <script>
+    // 資料來源：GitHub repo 裡的 report.json（由排程任務自動更新）
+    const DATA_URL = 'https://raw.githubusercontent.com/WCEC-Media/weekly-bulletin/main/report.json';
+
+    async function loadReport() {
+      const contentEl = document.getElementById('reportContent');
+      const updatedEl = document.getElementById('updatedTime');
+      contentEl.innerHTML = '<div class="empty-state"><div class="icon">⏳</div><div>正在讀取最新週報...</div></div>';
+
+      try {
+        // 加上時間戳避免瀏覽器/CDN快取抓到舊資料
+        const res = await fetch(DATA_URL + '?t=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) throw new Error('fetch failed: ' + res.status);
+        const data = await res.json();
+        updatedEl.textContent = '更新於：' + (data.updatedAt || '未知時間');
+        contentEl.innerHTML = data.html || '<p>（無內容）</p>';
+      } catch (err) {
+        contentEl.innerHTML = '<div class="empty-state"><div class="icon">📭</div><div>尚未有週報內容<br>排程任務執行後會自動顯示在這裡</div></div>';
+        updatedEl.textContent = '尚無資料';
+      }
+    }
+
+    loadReport();
+  </script>
+</body>
+</html>
