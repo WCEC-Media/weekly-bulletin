@@ -4,72 +4,104 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>週報</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #faf9f7; --card-bg: #ffffff; --text: #2b2926;
-    --text-light: #6b6862; --accent: #c96442; --border: #e8e4de;
+    --navy: #232d42;
+    --navy-light: #34405c;
+    --cream: #faf6ee;
+    --card: #ffffff;
+    --gold: #a8763e;
+    --gold-light: #c99a5f;
+    --text: #2b2926;
+    --text-light: #74716a;
+    --border: #ece5d8;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { -webkit-text-size-adjust: 100%; }
   body {
-    margin:0; padding:0; background:var(--bg); color:var(--text);
-    font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC",sans-serif;
-    line-height:1.7;
+    margin:0; padding:0; background:var(--cream); color:var(--text);
+    font-family:"Noto Sans TC", -apple-system, sans-serif;
+    line-height:1.85; font-size:16px;
   }
+  h1, h2, .serif { font-family:"Noto Serif TC", serif; }
+
   .header {
-    background:var(--card-bg); padding:16px 20px 12px; border-bottom:1px solid var(--border);
+    background:var(--navy); color:#f3ede0; padding:22px 20px 18px;
     position:sticky; top:0; z-index:10;
   }
-  .header h1 { margin:0 0 2px; font-size:17px; line-height:1.4; }
-  .header .updated { font-size:12px; color:var(--text-light); }
+  .header h1 {
+    margin:0 0 4px; font-size:20px; font-weight:700; letter-spacing:.02em;
+  }
+  .header .datebar {
+    font-size:13px; color:var(--gold-light); font-weight:500;
+  }
+  .header .rule {
+    height:2px; margin-top:14px; border-radius:2px;
+    background:linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 45%, transparent 100%);
+  }
+  .header .updated {
+    font-size:11.5px; color:#a9a690; margin-top:8px;
+  }
 
-  /* 快速跳轉膠囊列 */
   .quicknav {
     display:flex; gap:8px; overflow-x:auto; padding:12px 20px;
-    background:var(--card-bg); border-bottom:1px solid var(--border);
-    position:sticky; top:56px; z-index:9; -webkit-overflow-scrolling:touch;
-    scrollbar-width:none;
+    background:var(--navy-light); position:sticky; top:97px; z-index:9;
+    -webkit-overflow-scrolling:touch; scrollbar-width:none;
   }
   .quicknav::-webkit-scrollbar { display:none; }
   .quicknav a {
-    flex-shrink:0; padding:7px 14px; background:var(--bg); border:1px solid var(--border);
-    border-radius:999px; font-size:13px; color:var(--text); text-decoration:none;
-    white-space:nowrap;
+    flex-shrink:0; padding:7px 15px; border:1px solid rgba(201,154,95,.5);
+    border-radius:999px; font-size:13.5px; color:var(--gold-light); text-decoration:none;
+    white-space:nowrap; font-weight:500;
   }
-  .quicknav a:active { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .quicknav a:active { background:var(--gold); color:#fff; border-color:var(--gold); }
 
-  .container { max-width:640px; margin:0 auto; padding:16px 16px 60px; }
+  .container { max-width:640px; margin:0 auto; padding:18px 16px 60px; }
 
-  /* 手風琴段落 */
   .section {
-    background:var(--card-bg); border:1px solid var(--border); border-radius:12px;
-    margin-bottom:12px; overflow:hidden; scroll-margin-top:120px;
+    background:var(--card); border:1px solid var(--border); border-radius:14px;
+    margin-bottom:14px; overflow:hidden; scroll-margin-top:150px;
+    box-shadow:0 1px 3px rgba(35,45,66,.05);
   }
   .section summary {
-    padding:14px 16px; font-size:16px; font-weight:600; color:var(--accent);
-    cursor:pointer; list-style:none; display:flex; justify-content:space-between; align-items:center;
+    padding:16px 18px; font-size:17.5px; font-weight:700; color:var(--navy);
+    cursor:pointer; list-style:none; display:flex; align-items:center; gap:9px;
   }
   .section summary::-webkit-details-marker { display:none; }
-  .section summary::after { content:'▾'; font-size:13px; color:var(--text-light); transition:transform .2s; }
-  .section[open] summary::after { transform:rotate(180deg); }
-  .section .body { padding:0 16px 16px; font-size:15px; }
-  .section .body p { margin:8px 0; }
-  .section .body ul { padding-left:20px; margin:8px 0; }
-  .section .body li { margin:6px 0; }
-
-  .empty-state { text-align:center; padding:60px 20px; color:var(--text-light); }
-  .empty-state .icon { font-size:40px; margin-bottom:12px; }
-
-  .refresh-btn {
-    display:block; width:100%; padding:12px; margin-top:8px;
-    background:var(--accent); color:#fff; border:none; border-radius:8px;
-    font-size:14px; text-align:center; cursor:pointer;
+  .section summary .mark { color:var(--gold); font-size:15px; flex-shrink:0; }
+  .section summary .arrow {
+    margin-left:auto; font-size:12px; color:var(--text-light); transition:transform .25s;
+  }
+  .section[open] summary .arrow { transform:rotate(180deg); }
+  .section .body {
+    padding:0 18px 18px 43px; font-size:16px; color:var(--text);
+    border-top:1px solid var(--border); padding-top:14px;
+  }
+  .section .body p { margin:10px 0; }
+  .section .body ul { padding-left:20px; margin:10px 0; }
+  .section .body li { margin:8px 0; }
+  .section .body b { color:var(--navy); }
+  .section .body a {
+    color:var(--gold); font-weight:600; text-decoration:underline;
+    text-decoration-color: var(--gold-light); text-underline-offset:2px;
   }
 
-  /* 回到頂部浮動按鈕 */
+  .empty-state { text-align:center; padding:60px 20px; color:var(--text-light); }
+  .empty-state .icon { font-size:38px; margin-bottom:12px; }
+
+  .refresh-btn {
+    display:block; width:100%; padding:13px; margin-top:6px;
+    background:var(--navy); color:#f3ede0; border:none; border-radius:10px;
+    font-size:14.5px; text-align:center; cursor:pointer; font-weight:500;
+  }
+
   #backToTop {
-    position:fixed; bottom:20px; right:20px; width:46px; height:46px;
-    background:var(--accent); color:#fff; border:none; border-radius:50%;
-    font-size:20px; box-shadow:0 4px 12px rgba(0,0,0,.2);
+    position:fixed; bottom:22px; right:20px; width:48px; height:48px;
+    background:var(--gold); color:#fff; border:none; border-radius:50%;
+    font-size:20px; box-shadow:0 4px 14px rgba(35,45,66,.35);
     display:none; align-items:center; justify-content:center; cursor:pointer; z-index:20;
   }
   #backToTop.show { display:flex; }
@@ -77,7 +109,9 @@
 </head>
 <body>
   <div class="header">
-    <h1 id="churchName">📋 週報</h1>
+    <h1 id="churchName">週報</h1>
+    <div class="datebar" id="dateBar"></div>
+    <div class="rule"></div>
     <div class="updated" id="updatedTime">載入中...</div>
   </div>
   <nav class="quicknav" id="quicknav"></nav>
@@ -86,7 +120,7 @@
     <div class="empty-state"><div class="icon">⏳</div><div>正在讀取最新週報...</div></div>
   </div>
   <div class="container" style="padding-top:0">
-    <button class="refresh-btn" onclick="loadReport()">🔄 重新整理</button>
+    <button class="refresh-btn" onclick="loadReport()">重新整理</button>
   </div>
 
   <button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
@@ -105,9 +139,10 @@
         const res = await fetch(DATA_URL + '?t=' + Date.now(), { cache: 'no-store' });
         if (!res.ok) throw new Error('fetch failed');
         const data = await res.json();
-        document.getElementById('churchName').textContent =
-          '📋 ' + (data.church_name || '週報') + (data.date_label ? '｜' + data.date_label : '');
-        updatedEl.textContent = '資料更新於：' + (data.updatedAt || '未知時間');
+
+        document.getElementById('churchName').textContent = data.church_name || '週報';
+        document.getElementById('dateBar').textContent = data.date_label || '';
+        updatedEl.textContent = '資料更新於 ' + (data.updatedAt || '未知時間');
 
         const sections = data.sections || [];
         if (!sections.length) throw new Error('no sections');
@@ -118,7 +153,7 @@
 
         contentEl.innerHTML = sections.map((s, i) => `
           <details class="section" id="sec-${i}" ${i < 2 ? 'open' : ''}>
-            <summary>${s.title}</summary>
+            <summary><span class="mark">❖</span>${s.title}<span class="arrow">▾</span></summary>
             <div class="body">${s.html}</div>
           </details>
         `).join('');
@@ -129,14 +164,12 @@
       }
     }
 
-    // 回到頂部按鈕顯示/隱藏
     window.addEventListener('scroll', () => {
       const btn = document.getElementById('backToTop');
       if (window.scrollY > window.innerHeight * 0.6) btn.classList.add('show');
       else btn.classList.remove('show');
     });
 
-    // 平滑捲動錨點跳轉時，順便展開該段落
     document.addEventListener('click', (e) => {
       const a = e.target.closest('.quicknav a');
       if (!a) return;
