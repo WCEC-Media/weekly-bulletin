@@ -3,54 +3,76 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>週報 - 手機版</title>
+<title>週報</title>
 <style>
   :root {
-    --bg: #faf9f7;
-    --card-bg: #ffffff;
-    --text: #2b2926;
-    --text-light: #6b6862;
-    --accent: #c96442;
-    --border: #e8e4de;
+    --bg: #faf9f7; --card-bg: #ffffff; --text: #2b2926;
+    --text-light: #6b6862; --accent: #c96442; --border: #e8e4de;
   }
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body {
-    margin: 0;
-    padding: 0;
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Noto Sans TC", sans-serif;
-    line-height: 1.7;
+    margin:0; padding:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC",sans-serif;
+    line-height:1.7;
   }
   .header {
-    background: var(--card-bg);
-    padding: 20px 20px 16px;
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
+    background:var(--card-bg); padding:16px 20px 12px; border-bottom:1px solid var(--border);
+    position:sticky; top:0; z-index:10;
   }
-  .header h1 { font-size: 20px; margin: 0 0 4px; }
-  .header .updated { font-size: 13px; color: var(--text-light); }
-  .container { max-width: 640px; margin: 0 auto; padding: 20px 20px 60px; }
-  .card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 16px;
+  .header h1 { margin:0 0 2px; font-size:19px; }
+  .header .updated { font-size:12px; color:var(--text-light); }
+
+  /* 快速跳轉膠囊列 */
+  .quicknav {
+    display:flex; gap:8px; overflow-x:auto; padding:12px 20px;
+    background:var(--card-bg); border-bottom:1px solid var(--border);
+    position:sticky; top:56px; z-index:9; -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
   }
-  .content h2 { font-size: 17px; color: var(--accent); margin: 24px 0 10px; }
-  .content h2:first-child { margin-top: 0; }
-  .content p { font-size: 15px; margin: 8px 0; }
-  .content ul { padding-left: 20px; font-size: 15px; }
-  .content li { margin: 6px 0; }
-  .empty-state { text-align: center; padding: 60px 20px; color: var(--text-light); }
-  .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+  .quicknav::-webkit-scrollbar { display:none; }
+  .quicknav a {
+    flex-shrink:0; padding:7px 14px; background:var(--bg); border:1px solid var(--border);
+    border-radius:999px; font-size:13px; color:var(--text); text-decoration:none;
+    white-space:nowrap;
+  }
+  .quicknav a:active { background:var(--accent); color:#fff; border-color:var(--accent); }
+
+  .container { max-width:640px; margin:0 auto; padding:16px 16px 60px; }
+
+  /* 手風琴段落 */
+  .section {
+    background:var(--card-bg); border:1px solid var(--border); border-radius:12px;
+    margin-bottom:12px; overflow:hidden; scroll-margin-top:120px;
+  }
+  .section summary {
+    padding:14px 16px; font-size:16px; font-weight:600; color:var(--accent);
+    cursor:pointer; list-style:none; display:flex; justify-content:space-between; align-items:center;
+  }
+  .section summary::-webkit-details-marker { display:none; }
+  .section summary::after { content:'▾'; font-size:13px; color:var(--text-light); transition:transform .2s; }
+  .section[open] summary::after { transform:rotate(180deg); }
+  .section .body { padding:0 16px 16px; font-size:15px; }
+  .section .body p { margin:8px 0; }
+  .section .body ul { padding-left:20px; margin:8px 0; }
+  .section .body li { margin:6px 0; }
+
+  .empty-state { text-align:center; padding:60px 20px; color:var(--text-light); }
+  .empty-state .icon { font-size:40px; margin-bottom:12px; }
+
   .refresh-btn {
-    display: block; width: 100%; padding: 12px; margin-top: 16px;
-    background: var(--accent); color: white; border: none; border-radius: 8px;
-    font-size: 15px; text-align: center; cursor: pointer;
+    display:block; width:100%; padding:12px; margin-top:8px;
+    background:var(--accent); color:#fff; border:none; border-radius:8px;
+    font-size:14px; text-align:center; cursor:pointer;
   }
+
+  /* 回到頂部浮動按鈕 */
+  #backToTop {
+    position:fixed; bottom:20px; right:20px; width:46px; height:46px;
+    background:var(--accent); color:#fff; border:none; border-radius:50%;
+    font-size:20px; box-shadow:0 4px 12px rgba(0,0,0,.2);
+    display:none; align-items:center; justify-content:center; cursor:pointer; z-index:20;
+  }
+  #backToTop.show { display:flex; }
 </style>
 </head>
 <body>
@@ -58,36 +80,68 @@
     <h1>📋 週報</h1>
     <div class="updated" id="updatedTime">載入中...</div>
   </div>
-  <div class="container">
-    <div class="card">
-      <div class="content" id="reportContent">
-        <div class="empty-state"><div class="icon">⏳</div><div>正在讀取最新週報...</div></div>
-      </div>
-    </div>
+  <nav class="quicknav" id="quicknav"></nav>
+
+  <div class="container" id="content">
+    <div class="empty-state"><div class="icon">⏳</div><div>正在讀取最新週報...</div></div>
+  </div>
+  <div class="container" style="padding-top:0">
     <button class="refresh-btn" onclick="loadReport()">🔄 重新整理</button>
   </div>
 
+  <button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
   <script>
-    // 資料來源：GitHub repo 裡的 report.json（由排程任務自動更新）
     const DATA_URL = 'https://raw.githubusercontent.com/WCEC-Media/weekly-bulletin/main/report.json';
 
     async function loadReport() {
-      const contentEl = document.getElementById('reportContent');
+      const contentEl = document.getElementById('content');
+      const navEl = document.getElementById('quicknav');
       const updatedEl = document.getElementById('updatedTime');
       contentEl.innerHTML = '<div class="empty-state"><div class="icon">⏳</div><div>正在讀取最新週報...</div></div>';
+      navEl.innerHTML = '';
 
       try {
-        // 加上時間戳避免瀏覽器/CDN快取抓到舊資料
         const res = await fetch(DATA_URL + '?t=' + Date.now(), { cache: 'no-store' });
-        if (!res.ok) throw new Error('fetch failed: ' + res.status);
+        if (!res.ok) throw new Error('fetch failed');
         const data = await res.json();
         updatedEl.textContent = '更新於：' + (data.updatedAt || '未知時間');
-        contentEl.innerHTML = data.html || '<p>（無內容）</p>';
+
+        const sections = data.sections || [];
+        if (!sections.length) throw new Error('no sections');
+
+        navEl.innerHTML = sections.map((s, i) =>
+          `<a href="#sec-${i}">${s.title}</a>`
+        ).join('');
+
+        contentEl.innerHTML = sections.map((s, i) => `
+          <details class="section" id="sec-${i}" ${i < 2 ? 'open' : ''}>
+            <summary>${s.title}</summary>
+            <div class="body">${s.html}</div>
+          </details>
+        `).join('');
+
       } catch (err) {
         contentEl.innerHTML = '<div class="empty-state"><div class="icon">📭</div><div>尚未有週報內容<br>排程任務執行後會自動顯示在這裡</div></div>';
         updatedEl.textContent = '尚無資料';
       }
     }
+
+    // 回到頂部按鈕顯示/隱藏
+    window.addEventListener('scroll', () => {
+      const btn = document.getElementById('backToTop');
+      if (window.scrollY > window.innerHeight * 0.6) btn.classList.add('show');
+      else btn.classList.remove('show');
+    });
+
+    // 平滑捲動錨點跳轉時，順便展開該段落
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest('.quicknav a');
+      if (!a) return;
+      const id = a.getAttribute('href').slice(1);
+      const el = document.getElementById(id);
+      if (el && !el.open) el.open = true;
+    });
 
     loadReport();
   </script>
