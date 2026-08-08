@@ -37,6 +37,10 @@
   .header .datebar {
     font-size:13.5px; color:#f0d9b5; font-weight:600;
   }
+  .header .vision {
+    font-size:12.5px; color:#c9c4b0; margin-top:10px; line-height:1.6;
+  }
+  .header .vision b { color:#e8dcc4; }
   .header .rule {
     height:2px; margin-top:14px; border-radius:2px;
     background:linear-gradient(90deg, var(--gold-light) 0%, var(--gold) 45%, transparent 100%);
@@ -125,6 +129,22 @@
   table.duty tr:last-child td { border-bottom:none; }
   table.duty tr:nth-child(even) td:not(.this-week) { background:#faf8f3; }
 
+  /* 通用表格樣式(聚會時間表/代禱事項/事工計畫/兒童主日等) */
+  .duty-wrap table.plain {
+    width:100%; border-collapse:collapse; font-size:14px; min-width:340px;
+  }
+  table.plain th {
+    background:var(--navy); color:#f3ede0; padding:8px 9px; text-align:left; font-weight:600;
+  }
+  table.plain th:first-child { border-top-left-radius:8px; }
+  table.plain th:last-child { border-top-right-radius:8px; }
+  table.plain td {
+    padding:8px 9px; border-bottom:1px solid var(--border); color:var(--text); vertical-align:top;
+  }
+  table.plain tr:last-child td { border-bottom:none; }
+  table.plain tr:nth-child(even) td { background:#faf8f3; }
+  table.plain td:first-child { font-weight:600; color:var(--navy); white-space:nowrap; }
+
   .empty-state { text-align:center; padding:60px 20px; color:var(--text-light); }
   .empty-state .icon { font-size:38px; margin-bottom:12px; }
 
@@ -147,6 +167,7 @@
   <div class="header">
     <h1 id="churchName">週報</h1>
     <div class="datebar" id="dateBar"></div>
+    <div class="vision" id="visionBar"></div>
     <div class="rule"></div>
     <div class="updated" id="updatedTime">載入中...</div>
   </div>
@@ -178,6 +199,9 @@
 
         document.getElementById('churchName').textContent = data.church_name || '週報';
         document.getElementById('dateBar').textContent = data.date_label || '';
+        document.getElementById('visionBar').innerHTML =
+          (data.vision ? `<b>教會異象</b>　${data.vision}` : '') +
+          (data.theme ? `　｜　<b>年度主題</b>　${data.theme}` : '');
         updatedEl.textContent = '資料更新於 ' + (data.updatedAt || '未知時間');
 
         const sections = data.sections || [];
