@@ -19,7 +19,7 @@
     background:var(--card-bg); padding:16px 20px 12px; border-bottom:1px solid var(--border);
     position:sticky; top:0; z-index:10;
   }
-  .header h1 { margin:0 0 2px; font-size:19px; }
+  .header h1 { margin:0 0 2px; font-size:17px; line-height:1.4; }
   .header .updated { font-size:12px; color:var(--text-light); }
 
   /* 快速跳轉膠囊列 */
@@ -77,7 +77,7 @@
 </head>
 <body>
   <div class="header">
-    <h1>📋 週報</h1>
+    <h1 id="churchName">📋 週報</h1>
     <div class="updated" id="updatedTime">載入中...</div>
   </div>
   <nav class="quicknav" id="quicknav"></nav>
@@ -105,7 +105,9 @@
         const res = await fetch(DATA_URL + '?t=' + Date.now(), { cache: 'no-store' });
         if (!res.ok) throw new Error('fetch failed');
         const data = await res.json();
-        updatedEl.textContent = '更新於：' + (data.updatedAt || '未知時間');
+        document.getElementById('churchName').textContent =
+          '📋 ' + (data.church_name || '週報') + (data.date_label ? '｜' + data.date_label : '');
+        updatedEl.textContent = '資料更新於：' + (data.updatedAt || '未知時間');
 
         const sections = data.sections || [];
         if (!sections.length) throw new Error('no sections');
