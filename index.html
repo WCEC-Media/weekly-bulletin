@@ -106,6 +106,25 @@
   }
   .order-row .name { white-space:nowrap; flex-shrink:0; color:var(--navy); font-weight:600; }
 
+  /* 事奉輪值表 */
+  .duty-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; margin:4px -2px; }
+  table.duty {
+    width:100%; border-collapse:collapse; font-size:14.5px; min-width:380px;
+  }
+  table.duty th {
+    background:var(--navy); color:#f3ede0; padding:9px 10px; text-align:left;
+    font-weight:600; white-space:nowrap;
+  }
+  table.duty th:first-child { border-top-left-radius:8px; }
+  table.duty th:last-child { border-top-right-radius:8px; }
+  table.duty td {
+    padding:9px 10px; border-bottom:1px solid var(--border); color:var(--text);
+  }
+  table.duty td:first-child { font-weight:700; color:var(--navy); white-space:nowrap; }
+  table.duty td.this-week { background:#fbf1de; font-weight:600; color:var(--navy); }
+  table.duty tr:last-child td { border-bottom:none; }
+  table.duty tr:nth-child(even) td:not(.this-week) { background:#faf8f3; }
+
   .empty-state { text-align:center; padding:60px 20px; color:var(--text-light); }
   .empty-state .icon { font-size:38px; margin-bottom:12px; }
 
