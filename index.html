@@ -29,7 +29,11 @@
   h1, h2, .serif { font-family:"Noto Serif TC", serif; }
 
   .header {
-    background:var(--navy); color:#f3ede0; padding:22px 20px 18px;
+    background:var(--navy); color:#f3ede0; padding:18px 20px 18px;
+    text-align:center;
+  }
+  .header .logo {
+    max-width:100%; height:auto; margin-bottom:10px; border-radius:6px;
   }
   .header h1 {
     margin:0 0 4px; font-size:20px; font-weight:700; letter-spacing:.02em;
@@ -165,6 +169,7 @@
 </head>
 <body>
   <div class="header">
+    <img class="logo" id="churchLogo" src="assets/logo.png" alt="教會Logo" onerror="this.style.display='none'">
     <h1 id="churchName">週報</h1>
     <div class="datebar" id="dateBar"></div>
     <div class="vision" id="visionBar"></div>
