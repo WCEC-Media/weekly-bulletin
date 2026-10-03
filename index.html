@@ -114,40 +114,45 @@
   }
   .order-row .name { white-space:nowrap; flex-shrink:0; color:var(--navy); font-weight:600; }
 
-  /* 事奉輪值表 */
-  .duty-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; margin:4px -2px; }
-  table.duty {
-    width:100%; border-collapse:collapse; font-size:14.5px; min-width:380px;
+  /* 表格：一律塞進螢幕寬度，不需左右滑動 */
+  .duty-wrap { margin:4px 0; overflow-x:auto; }
+  table.duty, table.plain {
+    width:100%; border-collapse:collapse; table-layout:auto;
+    font-size:var(--tfs, 14.5px); line-height:1.5;
   }
-  table.duty th {
-    background:var(--navy); color:#f3ede0; padding:9px 10px; text-align:left;
+  table.duty th, table.plain th {
+    background:var(--navy); color:#f3ede0; padding:8px 7px; text-align:left;
     font-weight:600; white-space:nowrap;
   }
-  table.duty th:first-child { border-top-left-radius:8px; }
-  table.duty th:last-child { border-top-right-radius:8px; }
-  table.duty td {
-    padding:9px 10px; border-bottom:1px solid var(--border); color:var(--text);
+  table.duty th:first-child, table.plain th:first-child { border-top-left-radius:8px; }
+  table.duty th:last-child, table.plain th:last-child { border-top-right-radius:8px; }
+  table.duty td, table.plain td {
+    padding:8px 7px; border-bottom:1px solid var(--border); color:var(--text);
+    vertical-align:top; word-break:keep-all; overflow-wrap:anywhere;
   }
-  table.duty td:first-child { font-weight:700; color:var(--navy); white-space:nowrap; }
+  table.duty tr:last-child td, table.plain tr:last-child td { border-bottom:none; }
+
+  /* 事奉輪值表：職責欄窄、本週／下週欄平分 */
+  table.duty { table-layout:fixed; }
+  table.duty th:first-child, table.duty td:first-child { width:28%; }
+  table.duty td:first-child { font-weight:700; color:var(--navy); }
   table.duty td.this-week { background:#fbf1de; font-weight:600; color:var(--navy); }
-  table.duty tr:last-child td { border-bottom:none; }
   table.duty tr:nth-child(even) td:not(.this-week) { background:#faf8f3; }
 
-  /* 通用表格樣式(聚會時間表/代禱事項/事工計畫/兒童主日等) */
-  .duty-wrap table.plain {
-    width:100%; border-collapse:collapse; font-size:14px; min-width:340px;
-  }
-  table.plain th {
-    background:var(--navy); color:#f3ede0; padding:8px 9px; text-align:left; font-weight:600;
-  }
-  table.plain th:first-child { border-top-left-radius:8px; }
-  table.plain th:last-child { border-top-right-radius:8px; }
-  table.plain td {
-    padding:8px 9px; border-bottom:1px solid var(--border); color:var(--text); vertical-align:top;
-  }
-  table.plain tr:last-child td { border-bottom:none; }
+  /* 通用表格(聚會時間/代禱/事工計畫/兒童主日/奉獻支出) */
   table.plain tr:nth-child(even) td { background:#faf8f3; }
-  table.plain td:first-child { font-weight:600; color:var(--navy); white-space:nowrap; }
+  table.plain th { white-space:normal; word-break:keep-all; }
+  table.tight th, table.tight td { padding:6px 3px !important; }
+  table.plain td:first-child { font-weight:600; color:var(--navy); }
+  table.plain td.num, table.plain th.num { text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums; }
+
+  @media (max-width:480px) {
+    .container { padding:14px 10px 60px; }
+    .section summary { padding:14px 14px; }
+    .section .body { padding:12px 12px 14px; }
+    table.duty, table.plain { --tfs:14px; }
+    table.duty th, table.plain th, table.duty td, table.plain td { padding:7px 5px; }
+  }
 
   .empty-state { text-align:center; padding:60px 20px; color:var(--text-light); }
   .empty-state .icon { font-size:38px; margin-bottom:12px; }
@@ -222,12 +227,41 @@
             <div class="body">${s.html}</div>
           </details>
         `).join('');
+        fitTables();
 
       } catch (err) {
         contentEl.innerHTML = '<div class="empty-state"><div class="icon">📭</div><div>尚未有週報內容<br>排程任務執行後會自動顯示在這裡</div></div>';
         updatedEl.textContent = '尚無資料';
       }
     }
+
+
+    // 若表格仍比容器寬，逐步縮小字體(最小11px)，讓整張表在一個畫面內
+    function fitTables() {
+      document.querySelectorAll('table.plain, table.duty').forEach(t => {
+        // 數字欄靠右對齊
+        t.querySelectorAll('td').forEach(td => {
+          if (/^[\s$\d,.\-—<>\/bB]+$/.test(td.textContent) && /\d/.test(td.textContent)) td.classList.add('num');
+        });
+        const wrap = t.parentElement;
+        let size = parseFloat(getComputedStyle(t).fontSize);
+        while (t.scrollWidth > wrap.clientWidth + 1 && size > 10) {
+          size -= 0.5;
+          t.style.fontSize = size + 'px';
+          if (size <= 12.5) t.classList.add('tight');
+        }
+      });
+    }
+    let fitTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(fitTimer);
+      fitTimer = setTimeout(() => {
+        document.querySelectorAll('table.plain, table.duty').forEach(t => { t.style.fontSize = ''; t.classList.remove('tight'); });
+        fitTables();
+      }, 150);
+    });
+    // 收合的段落展開時才有寬度，展開後再調整一次
+    document.addEventListener('toggle', e => { if (e.target.open) fitTables(); }, true);
 
     window.addEventListener('scroll', () => {
       const btn = document.getElementById('backToTop');
